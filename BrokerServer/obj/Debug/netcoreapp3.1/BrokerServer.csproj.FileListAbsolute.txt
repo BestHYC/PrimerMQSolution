@@ -1,0 +1,13 @@
+D:\MyCode\PrimerMQSolution\BrokerServer\bin\Debug\netcoreapp3.1\BrokerServer.exe
+D:\MyCode\PrimerMQSolution\BrokerServer\bin\Debug\netcoreapp3.1\BrokerServer.deps.json
+D:\MyCode\PrimerMQSolution\BrokerServer\bin\Debug\netcoreapp3.1\BrokerServer.runtimeconfig.json
+D:\MyCode\PrimerMQSolution\BrokerServer\bin\Debug\netcoreapp3.1\BrokerServer.runtimeconfig.dev.json
+D:\MyCode\PrimerMQSolution\BrokerServer\bin\Debug\netcoreapp3.1\BrokerServer.dll
+D:\MyCode\PrimerMQSolution\BrokerServer\bin\Debug\netcoreapp3.1\BrokerServer.pdb
+D:\MyCode\PrimerMQSolution\BrokerServer\obj\Debug\netcoreapp3.1\BrokerServer.csprojAssemblyReference.cache
+D:\MyCode\PrimerMQSolution\BrokerServer\obj\Debug\netcoreapp3.1\BrokerServer.AssemblyInfoInputs.cache
+D:\MyCode\PrimerMQSolution\BrokerServer\obj\Debug\netcoreapp3.1\BrokerServer.AssemblyInfo.cs
+D:\MyCode\PrimerMQSolution\BrokerServer\obj\Debug\netcoreapp3.1\BrokerServer.csproj.CoreCompileInputs.cache
+D:\MyCode\PrimerMQSolution\BrokerServer\obj\Debug\netcoreapp3.1\BrokerServer.dll
+D:\MyCode\PrimerMQSolution\BrokerServer\obj\Debug\netcoreapp3.1\BrokerServer.pdb
+D:\MyCode\PrimerMQSolution\BrokerServer\obj\Debug\netcoreapp3.1\BrokerServer.genruntimeconfig.cache

@@ -1,0 +1,13 @@
+D:\MyCode\PrimerMQSolution\ConsumerServer\bin\Debug\netcoreapp3.1\ConsumerServer.exe
+D:\MyCode\PrimerMQSolution\ConsumerServer\bin\Debug\netcoreapp3.1\ConsumerServer.deps.json
+D:\MyCode\PrimerMQSolution\ConsumerServer\bin\Debug\netcoreapp3.1\ConsumerServer.runtimeconfig.json
+D:\MyCode\PrimerMQSolution\ConsumerServer\bin\Debug\netcoreapp3.1\ConsumerServer.runtimeconfig.dev.json
+D:\MyCode\PrimerMQSolution\ConsumerServer\bin\Debug\netcoreapp3.1\ConsumerServer.dll
+D:\MyCode\PrimerMQSolution\ConsumerServer\bin\Debug\netcoreapp3.1\ConsumerServer.pdb
+D:\MyCode\PrimerMQSolution\ConsumerServer\obj\Debug\netcoreapp3.1\ConsumerServer.csprojAssemblyReference.cache
+D:\MyCode\PrimerMQSolution\ConsumerServer\obj\Debug\netcoreapp3.1\ConsumerServer.AssemblyInfoInputs.cache
+D:\MyCode\PrimerMQSolution\ConsumerServer\obj\Debug\netcoreapp3.1\ConsumerServer.AssemblyInfo.cs
+D:\MyCode\PrimerMQSolution\ConsumerServer\obj\Debug\netcoreapp3.1\ConsumerServer.csproj.CoreCompileInputs.cache
+D:\MyCode\PrimerMQSolution\ConsumerServer\obj\Debug\netcoreapp3.1\ConsumerServer.dll
+D:\MyCode\PrimerMQSolution\ConsumerServer\obj\Debug\netcoreapp3.1\ConsumerServer.pdb
+D:\MyCode\PrimerMQSolution\ConsumerServer\obj\Debug\netcoreapp3.1\ConsumerServer.genruntimeconfig.cache
