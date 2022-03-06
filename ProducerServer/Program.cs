@@ -9,6 +9,7 @@ namespace ProducerServer
     {
         static void Main(string[] args)
         {
+            var a11 = Encoding.UTF8.GetBytes(String.Format("{0,8}", 1));
             int? a = null;
             a = 0;
             Console.WriteLine(a == 0);
@@ -39,15 +40,28 @@ namespace ProducerServer
                 {
                     break;
                 }
-                socket.Send(Encoding.UTF8.GetBytes(input));
+                String body = String.Format("{0,8}", input.Length) + input;
+                socket.Send(Encoding.UTF8.GetBytes(body));
                 data = new byte[1024];
-                recv = socket.Receive(data);
-                stringData = Encoding.UTF8.GetString(data, 0, recv);
-                Console.WriteLine(stringData);
+                while(recv < body.Length)
+                {
+                    int r  = socket.Receive(data);
+                    stringData = Encoding.UTF8.GetString(data, 0, r);
+                    Console.WriteLine(stringData);
+                    recv += r;
+                }
+                recv = 0;
+               
+               
             }
             Console.WriteLine("disconnect from server");
             socket.Shutdown(SocketShutdown.Both);
             socket.Close();
         }
+    }
+    public class PrimerMQSendModel
+    {
+        public Int32 Length { get; set; }
+        public String Body { get; set; }
     }
 }

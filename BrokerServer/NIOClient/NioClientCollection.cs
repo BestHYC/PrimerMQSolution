@@ -94,7 +94,6 @@ namespace BrokerServer.NIOClient
                 var buffer = new byte[e.BytesTransferred];
                 Buffer.BlockCopy(receiveBuffer, 0, buffer, 0, e.BytesTransferred);
                 Console.WriteLine(Encoding.UTF8.GetString(buffer));
-                
             }
             else
             {

@@ -4,7 +4,6 @@ D:\MyCode\PrimerMQSolution\ProducerServer\bin\Debug\netcoreapp3.1\ProducerServer
 D:\MyCode\PrimerMQSolution\ProducerServer\bin\Debug\netcoreapp3.1\ProducerServer.runtimeconfig.dev.json
 D:\MyCode\PrimerMQSolution\ProducerServer\bin\Debug\netcoreapp3.1\ProducerServer.dll
 D:\MyCode\PrimerMQSolution\ProducerServer\bin\Debug\netcoreapp3.1\ProducerServer.pdb
-D:\MyCode\PrimerMQSolution\ProducerServer\obj\Debug\netcoreapp3.1\ProducerServer.csprojAssemblyReference.cache
 D:\MyCode\PrimerMQSolution\ProducerServer\obj\Debug\netcoreapp3.1\ProducerServer.AssemblyInfoInputs.cache
 D:\MyCode\PrimerMQSolution\ProducerServer\obj\Debug\netcoreapp3.1\ProducerServer.AssemblyInfo.cs
 D:\MyCode\PrimerMQSolution\ProducerServer\obj\Debug\netcoreapp3.1\ProducerServer.csproj.CoreCompileInputs.cache
