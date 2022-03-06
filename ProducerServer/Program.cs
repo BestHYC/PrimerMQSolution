@@ -40,8 +40,12 @@ namespace ProducerServer
                 {
                     break;
                 }
-                String body = String.Format("{0,8}", input.Length) + input;
-                socket.Send(Encoding.UTF8.GetBytes(body));
+                byte[] body = Encoding.UTF8.GetBytes(input);
+                byte[] len = BitConverter.GetBytes(body.Length);
+                byte[] buffer = new byte[body.Length + 4];
+                Array.Copy(len, buffer, 4);
+                Array.Copy(body, 0, buffer, 4, body.Length);
+                socket.Send(buffer);
                 data = new byte[1024];
                 while(recv < body.Length)
                 {

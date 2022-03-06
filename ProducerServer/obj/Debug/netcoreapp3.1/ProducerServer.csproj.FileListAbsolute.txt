@@ -10,3 +10,4 @@ D:\MyCode\PrimerMQSolution\ProducerServer\obj\Debug\netcoreapp3.1\ProducerServer
 D:\MyCode\PrimerMQSolution\ProducerServer\obj\Debug\netcoreapp3.1\ProducerServer.dll
 D:\MyCode\PrimerMQSolution\ProducerServer\obj\Debug\netcoreapp3.1\ProducerServer.pdb
 D:\MyCode\PrimerMQSolution\ProducerServer\obj\Debug\netcoreapp3.1\ProducerServer.genruntimeconfig.cache
+D:\MyCode\PrimerMQSolution\ProducerServer\obj\Debug\netcoreapp3.1\ProducerServer.csprojAssemblyReference.cache
