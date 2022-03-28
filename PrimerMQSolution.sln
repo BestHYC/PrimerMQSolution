@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31313.79
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProducerServer", "ProducerServer\ProducerServer.csproj", "{C80CC0CC-78D6-47AF-AB38-D23031453BAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProducerServer", "ProducerServer\ProducerServer.csproj", "{C80CC0CC-78D6-47AF-AB38-D23031453BAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsumerServer", "ConsumerServer\ConsumerServer.csproj", "{BE6832FE-C4DE-46A2-82A8-D6FA71827CCF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsumerServer", "ConsumerServer\ConsumerServer.csproj", "{BE6832FE-C4DE-46A2-82A8-D6FA71827CCF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrokerServer", "BrokerServer\BrokerServer.csproj", "{6F47C5E5-80C5-4CA8-9372-CBD0D85C1FC9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrokerServer", "BrokerServer\BrokerServer.csproj", "{6F47C5E5-80C5-4CA8-9372-CBD0D85C1FC9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

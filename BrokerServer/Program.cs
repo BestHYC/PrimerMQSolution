@@ -13,7 +13,12 @@ namespace BrokerServer
         static void Main(string[] args)
         {
             IPEndPoint ipEnd = new IPEndPoint(IPAddress.Any, 5566);
-            Server server = new Server(1000, 1024 * 1025);
+            Server server = new Server(1000, 1024 * 1024);
+            server.ExecuteReceiveData += (buff) =>
+            {
+                Console.WriteLine(buff);
+                return "";
+            };
             server.Start(ipEnd);
             Console.WriteLine("Press any key to terminate the server process....");
             Console.ReadKey();
