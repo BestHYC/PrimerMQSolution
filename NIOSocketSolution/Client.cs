@@ -4,14 +4,15 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ProducerServer.NIOClient
 {
-    class Client
+    public class Client
     {
         SocketAsyncEventArgsPool m_sendPool;
         private Int32 m_bufferSize;
-        private event OnReceiveData ExecuteReceiveData;
+        public event OnReceiveComplete ReceiveComplete;
         private Socket m_socket;
         public Client(Int32 bufferSize)
         {
@@ -97,8 +98,17 @@ namespace ProducerServer.NIOClient
                     //从数据池中移除这组数据  
                     token.Buffer.RemoveRange(0, packageLen + 4);
                     //将数据包交给后台处理,这里你也可以新开个线程来处理.加快速度.  
-                    if (ExecuteReceiveData != null)
-                        ExecuteReceiveData.BeginInvoke(token, result, ExecuteSendAsyncCallBack, token);
+                    //另外beginInvoke 在.net core 3.1平台不允许操作了
+                    if (ReceiveComplete != null)
+                    {
+                        Task.Run(() =>
+                        {
+                            return ReceiveComplete.Invoke(result);
+                        }).ContinueWith(result =>
+                        {
+                            ExecuteSendAsyncCallBack(result.Result);
+                        });
+                    }
                     //这里API处理完后,并没有返回结果,当然结果是要返回的,却不是在这里, 这里的代码只管接收.  
                     //若要返回结果,可在API处理中调用此类对象的SendMessage方法,统一打包发送.不要被微软的示例给迷惑了.  
                 };
@@ -111,9 +121,8 @@ namespace ProducerServer.NIOClient
                 CloseClientSocket();
             }
         }
-        private void ExecuteSendAsyncCallBack(IAsyncResult result)
+        private void ExecuteSendAsyncCallBack(String sendData)
         {
-            String sendData = ExecuteReceiveData.EndInvoke(result);
             SendAsync(sendData);
         }
         private void ProcessSend(SocketAsyncEventArgs e)

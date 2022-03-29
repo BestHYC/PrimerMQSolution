@@ -1,10 +1,7 @@
-﻿using BrokerServer.NIOClient;
+﻿using ProducerServer.NIOClient;
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BrokerServer
 {
@@ -14,10 +11,10 @@ namespace BrokerServer
         {
             IPEndPoint ipEnd = new IPEndPoint(IPAddress.Any, 5566);
             Server server = new Server(1000, 1024 * 1024);
-            server.ExecuteReceiveData += (buff) =>
+            server.OnReceiveComplete += (buff) =>
             {
                 Console.WriteLine(buff);
-                return "";
+                return buff;
             };
             server.Start(ipEnd);
             Console.WriteLine("Press any key to terminate the server process....");
@@ -32,13 +29,11 @@ namespace BrokerServer
             socket.Bind(ipEnd);
             socket.Listen(10);
             Console.WriteLine("Waiting for a client");
-            NioClientCollection nioClientList = new NioClientCollection();
             try
             {
                 while (true)
                 {
                     Socket client1 = socket.Accept();
-                    nioClientList.Add(client1);
                 }
             }
             catch (Exception e)

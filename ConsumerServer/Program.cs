@@ -1,5 +1,4 @@
-﻿using ConsumerServer.NIOClient;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -13,12 +12,9 @@ namespace ConsumerServer
             IPAddress ip = IPAddress.Parse("127.0.0.1");
             IPEndPoint ipEnd = new IPEndPoint(ip, 5566);
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            NioClientCollection collection = new NioClientCollection();
             try
             {
                 socket.Connect(ipEnd);
-                
-                collection.Add(socket);
             }
             catch (SocketException e)
             {
@@ -36,7 +32,6 @@ namespace ConsumerServer
                 {
                     break;
                 }
-                collection.SocketSend(input);
             }
             Console.WriteLine("disconnect from server");
             socket.Shutdown(SocketShutdown.Both);
