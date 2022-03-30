@@ -39,15 +39,15 @@ namespace NIOSocketSolution
             m_bufferManager.InitBuffer();
             for (int i = 0; i < m_numConnections; i++)
             {
-                SocketAsyncEventArgs readWriteEventArg = new SocketAsyncEventArgs();
-                readWriteEventArg.Completed += new EventHandler<SocketAsyncEventArgs>(IO_Completed);
-                readWriteEventArg.UserToken = new AsyncUserToken();
-                m_bufferManager.SetBuffer(readWriteEventArg);
-                m_receivePool.Push(readWriteEventArg);
-                SocketAsyncEventArgs writeAtg = new SocketAsyncEventArgs();
-                writeAtg.Completed += new EventHandler<SocketAsyncEventArgs>(IO_Completed);
-                m_bufferManager.SetBuffer(readWriteEventArg);
-                m_sendPool.Push(writeAtg);
+                SocketAsyncEventArgs readArgs = new SocketAsyncEventArgs();
+                readArgs.Completed += new EventHandler<SocketAsyncEventArgs>(IO_Completed);
+                readArgs.UserToken = new AsyncUserToken();
+                m_bufferManager.SetBuffer(readArgs);
+                m_receivePool.Push(readArgs);
+                SocketAsyncEventArgs writeArgs = new SocketAsyncEventArgs();
+                writeArgs.Completed += new EventHandler<SocketAsyncEventArgs>(IO_Completed);
+                m_bufferManager.SetBuffer(writeArgs);
+                m_sendPool.Push(writeArgs);
             }
         }
         public void Start(IPEndPoint localEndPoint, IPEndPoint ipEnd = null)
@@ -58,14 +58,8 @@ namespace NIOSocketSolution
             }
             listenSocket = new Socket(localEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             listenSocket.Bind(localEndPoint);
-            listenSocket.Connect(ipEnd);
             listenSocket.Listen(100);
             StartAccept(null);
-        }
-        public void Connect(IPEndPoint ipEnd)
-        {
-            var result = listenSocket.BeginConnect(ipEnd, null, null);
-            listenSocket.EndConnect(result);
         }
         public void StartAccept(SocketAsyncEventArgs acceptEventArg)
         {
@@ -140,7 +134,7 @@ namespace NIOSocketSolution
                     if (packageLen > token.Buffer.Count - 4) break;
                     //包够长时,则提取出来,交给后面的程序去处理  
                     byte[] rev = token.Buffer.GetRange(4, packageLen).ToArray();
-                    String result = UnicodeEncoding.Unicode.GetString(rev);
+                    String result = Encoding.UTF8.GetString(rev);
                     //从数据池中移除这组数据  
                     token.Buffer.RemoveRange(0, packageLen + 4);
                     //将数据包交给后台处理,这里你也可以新开个线程来处理.加快速度.  
@@ -181,6 +175,7 @@ namespace NIOSocketSolution
             Array.Copy(body, lenSize, sendEventArgs.Buffer, sendEventArgs.Offset + len.Length, bufferSize);
             lenSize += bufferSize;
             size -= bufferSize;
+            sendEventArgs.SetBuffer(0, bufferSize + len.Length);
             if (!token.Socket.SendAsync(sendEventArgs))
             {
                 this.ProcessSend(sendEventArgs);
@@ -219,9 +214,10 @@ namespace NIOSocketSolution
 
         private void ProcessSend(SocketAsyncEventArgs e)
         {
+            m_sendPool.Push(e);
             if (e.SocketError == SocketError.Success)
             {
-                m_sendPool.Push(e);
+                Console.WriteLine("发送消息成功");
             }
             else
             {

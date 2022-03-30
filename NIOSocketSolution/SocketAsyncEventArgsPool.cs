@@ -79,7 +79,6 @@ namespace NIOSocketSolution
                 {
                     item = func();
                 }
-                m_pool.Push(item);
             }
             Volatile.Write(ref m_pushLock, 0);
             Volatile.Write(ref m_popLock, 0);

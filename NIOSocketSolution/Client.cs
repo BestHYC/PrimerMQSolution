@@ -14,11 +14,13 @@ namespace NIOSocketSolution
         SocketAsyncEventArgsPool m_sendPool;
         private readonly Int32 m_bufferSize;
         public event OnReceiveComplete OnReceiveComplete;
+        private List<byte> m_buffer;
         private Socket m_socket;
         public Client(Int32 bufferSize)
         {
             m_bufferSize = bufferSize;
             m_sendPool = SocketAsyncEventArgsPool.InstanceSend;
+            m_buffer = new List<byte>(bufferSize);
         }
         public void StartConnect(IPEndPoint endPoint)
         {
@@ -40,6 +42,16 @@ namespace NIOSocketSolution
         void IO_Connection(object sender, SocketAsyncEventArgs e)
         {
             Console.WriteLine($"已成功链接服务器,{((IPEndPoint)e.RemoteEndPoint).AddressFamily}");
+            ProcessConnection(e);
+        }
+        private void ProcessConnection(SocketAsyncEventArgs e)
+        {
+            SocketAsyncEventArgs sendEventArgs = m_sendPool.PopOrNew(CreateArg);
+            bool willRaiseEvent = m_socket.ReceiveAsync(sendEventArgs);
+            if (!willRaiseEvent)
+            {
+                ProcessReceive(sendEventArgs);
+            }
         }
         void IO_Completed(object sender, SocketAsyncEventArgs e)
         {
@@ -75,6 +87,7 @@ namespace NIOSocketSolution
             Array.Copy(body, lenSize, sendEventArgs.Buffer, len.Length, bufferSize);
             lenSize += bufferSize;
             size -= bufferSize;
+            sendEventArgs.SetBuffer(0, bufferSize + len.Length);
             if (!m_socket.SendAsync(sendEventArgs))
             {
                 this.ProcessSend(sendEventArgs);
@@ -92,7 +105,7 @@ namespace NIOSocketSolution
                     bufferSize = m_bufferSize;
                 }
                 Array.Copy(body, lenSize, sendEventArgs.Buffer, sendEventArgs.Offset, bufferSize);
-                sendEventArgs.SetBuffer(0, m_bufferSize);
+                sendEventArgs.SetBuffer(0, bufferSize);
                 size -= bufferSize;
                 lenSize += bufferSize;
                 if (!m_socket.SendAsync(sendEventArgs))
@@ -103,21 +116,20 @@ namespace NIOSocketSolution
         }
         private void ProcessReceive(SocketAsyncEventArgs e)
         {
-            AsyncUserToken token = (AsyncUserToken)e.UserToken;
             if (e.BytesTransferred > 0)
             {
-                token.Buffer.AddArgsByte(e);
-                while (token.Buffer.Count > 4)
+                m_buffer.AddArgsByte(e);
+                while (m_buffer.Count > 4)
                 {
                     //判断包的长度  
-                    byte[] lenBytes = token.Buffer.GetRange(0, 4).ToArray();
+                    byte[] lenBytes = m_buffer.GetRange(0, 4).ToArray();
                     int packageLen = BitConverter.ToInt32(lenBytes, 0);
-                    if (packageLen > token.Buffer.Count - 4) break;
+                    if (packageLen > m_buffer.Count - 4) break;
                     //包够长时,则提取出来,交给后面的程序去处理  
-                    byte[] rev = token.Buffer.GetRange(4, packageLen).ToArray();
-                    String result = UnicodeEncoding.Unicode.GetString(rev);
+                    byte[] rev = m_buffer.GetRange(4, packageLen).ToArray();
+                    String result = Encoding.UTF8.GetString(rev);
                     //从数据池中移除这组数据  
-                    token.Buffer.RemoveRange(0, packageLen + 4);
+                    m_buffer.RemoveRange(0, packageLen + 4);
                     //将数据包交给后台处理,这里你也可以新开个线程来处理.加快速度.  
                     //另外beginInvoke 在.net core 3.1平台不允许操作了
                     if (OnReceiveComplete != null)
@@ -134,7 +146,7 @@ namespace NIOSocketSolution
                     //若要返回结果,可在API处理中调用此类对象的SendMessage方法,统一打包发送.不要被微软的示例给迷惑了.  
                 };
                 //继续接收. 为什么要这么写,请看Socket.ReceiveAsync方法的说明  
-                if (!token.Socket.ReceiveAsync(e))
+                if (!m_socket.ReceiveAsync(e))
                     this.ProcessReceive(e);
             }
             else

@@ -9,7 +9,8 @@ namespace NIOSocketSolution
     {
         public static void AddArgsByte(this List<Byte> list, SocketAsyncEventArgs args)
         {
-            for(int i = args.Offset; i < args.BytesTransferred; i++)
+            int len = args.Offset + args.BytesTransferred;
+            for (int i = args.Offset; i < len; i++)
             {
                 list.Add(args.Buffer[i]);
             }

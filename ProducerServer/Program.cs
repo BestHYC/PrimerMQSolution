@@ -1,9 +1,8 @@
-﻿using ProducerServer.NIOClient;
+﻿using NIOSocketSolution;
 using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 
 namespace ProducerServer
 {
@@ -15,6 +14,11 @@ namespace ProducerServer
             IPAddress ip = IPAddress.Parse("127.0.0.1");
             IPEndPoint ipConnect = new IPEndPoint(ip, 5566);
             client.StartConnect(ipConnect);
+            client.OnReceiveComplete += result =>
+            {
+                Console.WriteLine(result);
+                return "";
+            };
             string input;
             while (true)
             {
