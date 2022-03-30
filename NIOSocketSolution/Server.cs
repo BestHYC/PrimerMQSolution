@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ProducerServer.NIOClient
+namespace NIOSocketSolution
 {
     public class Server
     {
@@ -129,9 +130,7 @@ namespace ProducerServer.NIOClient
             if (e.BytesTransferred > 0)
             {
                 //读取数据  
-                byte[] data = new byte[e.BytesTransferred];
-                Array.Copy(e.Buffer, e.Offset, data, 0, e.BytesTransferred);
-                token.Buffer.AddRange(data);
+                token.Buffer.AddArgsByte(e);
                 while (token.Buffer.Count > 4)
                 {
                     //判断包的长度  
@@ -169,27 +168,44 @@ namespace ProducerServer.NIOClient
         }
         private void ExecuteSendAsyncCallBack(AsyncUserToken token, String sendData)
         {
+            if (String.IsNullOrWhiteSpace(sendData)) return;
             byte[] body = Encoding.UTF8.GetBytes(sendData);
             byte[] len = BitConverter.GetBytes(body.Length);
-            byte[] buffer = new byte[body.Length + 4];
-            Array.Copy(len, buffer, 4);
-            Array.Copy(body, 0, buffer, 4, body.Length);
-            int size = body.Length + 4, lenSize = 0;
-            while (size > 0)
+            SocketAsyncEventArgs sendEventArgs = m_sendPool.Pop();
+            Array.Copy(len, 0, sendEventArgs.Buffer, sendEventArgs.Offset, len.Length);
+            int size = body.Length, lenSize = 0, bufferSize = m_receiveBufferSize - len.Length;
+            if (size <= bufferSize)
             {
-                SocketAsyncEventArgs writeEventArgs = m_sendPool.Pop();
-                int bufferSize = m_receiveBufferSize;
-                if (size < bufferSize) bufferSize = size;
-                Array.Copy(buffer, lenSize, writeEventArgs.Buffer, writeEventArgs.Offset, bufferSize);
-                writeEventArgs.SetBuffer(writeEventArgs.Offset, bufferSize);
-                lenSize += bufferSize;
-                size -= bufferSize;
-                if (!token.Socket.SendAsync(writeEventArgs))
+                bufferSize = size;
+            }
+            Array.Copy(body, lenSize, sendEventArgs.Buffer, sendEventArgs.Offset + len.Length, bufferSize);
+            lenSize += bufferSize;
+            size -= bufferSize;
+            if (!token.Socket.SendAsync(sendEventArgs))
+            {
+                this.ProcessSend(sendEventArgs);
+            }
+            while (true)
+            {
+                if (size <= 0) break;
+                sendEventArgs = m_sendPool.Pop();
+                if (size <= m_receiveBufferSize)
                 {
-                    this.ProcessSend(writeEventArgs);
+                    bufferSize = size;
+                }
+                else
+                {
+                    bufferSize = m_receiveBufferSize;
+                }
+                Array.Copy(body, lenSize, sendEventArgs.Buffer, sendEventArgs.Offset, bufferSize);
+                sendEventArgs.SetBuffer(sendEventArgs.Offset, bufferSize);
+                size -= bufferSize;
+                lenSize += bufferSize;
+                if (!token.Socket.SendAsync(sendEventArgs))
+                {
+                    this.ProcessSend(sendEventArgs);
                 }
             }
-
         }
         private void SendWrapper(SocketAsyncEventArgs e)
         {

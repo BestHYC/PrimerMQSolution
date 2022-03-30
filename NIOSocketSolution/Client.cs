@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ProducerServer.NIOClient
+namespace NIOSocketSolution
 {
     public class Client
     {
         SocketAsyncEventArgsPool m_sendPool;
-        private Int32 m_bufferSize;
-        public event OnReceiveComplete ReceiveComplete;
+        private readonly Int32 m_bufferSize;
+        public event OnReceiveComplete OnReceiveComplete;
         private Socket m_socket;
         public Client(Int32 bufferSize)
         {
@@ -22,10 +23,10 @@ namespace ProducerServer.NIOClient
         public void StartConnect(IPEndPoint endPoint)
         {
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            SocketAsyncEventArgs readWriteEventArg = new SocketAsyncEventArgs();
-            readWriteEventArg.Completed += new EventHandler<SocketAsyncEventArgs>(IO_Connection);
-            readWriteEventArg.RemoteEndPoint = endPoint;
-            socket.ConnectAsync(readWriteEventArg);
+            SocketAsyncEventArgs connectEventArg = new SocketAsyncEventArgs();
+            connectEventArg.Completed += new EventHandler<SocketAsyncEventArgs>(IO_Connection);
+            connectEventArg.RemoteEndPoint = endPoint;
+            socket.ConnectAsync(connectEventArg);
             m_socket = socket;
         }
         public SocketAsyncEventArgs CreateArg()
@@ -38,7 +39,7 @@ namespace ProducerServer.NIOClient
         }
         void IO_Connection(object sender, SocketAsyncEventArgs e)
         {
-            Console.WriteLine("已成功链接服务器");
+            Console.WriteLine($"已成功链接服务器,{((IPEndPoint)e.RemoteEndPoint).AddressFamily}");
         }
         void IO_Completed(object sender, SocketAsyncEventArgs e)
         {
@@ -54,26 +55,49 @@ namespace ProducerServer.NIOClient
                     throw new ArgumentException("The last operation completed on the socket was not a receive or send");
             }
         }
+        /// <summary>
+        /// 异步方式发送消息,每次会首先取缓存的SocketAsyncEventArgs,如果没,则创建新的
+        /// 注意此处没共享字节,因为SocketAsyncEventArgs本身就是缓存,并且没有限制此对象数量(可加)
+        /// </summary>
+        /// <param name="sendData"></param>
         public void SendAsync(String sendData)
         {
+            if (String.IsNullOrWhiteSpace(sendData)) return;
             byte[] body = Encoding.UTF8.GetBytes(sendData);
             byte[] len = BitConverter.GetBytes(body.Length);
-            byte[] buffer = new byte[body.Length + 4];
-            Array.Copy(len, buffer, 4);
-            Array.Copy(body, 0, buffer, 4, body.Length);
-            int size = body.Length + 4, lenSize = 0;
-            while (size > 0)
+            SocketAsyncEventArgs sendEventArgs = m_sendPool.PopOrNew(CreateArg);
+            Array.Copy(len, 0, sendEventArgs.Buffer, sendEventArgs.Offset, len.Length);
+            int size = body.Length, lenSize = 0, bufferSize = m_bufferSize - len.Length;
+            if (size <= bufferSize)
             {
-                SocketAsyncEventArgs writeEventArgs = m_sendPool.PopOrNew(CreateArg);
-                int bufferSize = m_bufferSize;
-                if (size < bufferSize) bufferSize = size;
-                Array.Copy(buffer, lenSize, writeEventArgs.Buffer, 0, bufferSize);
-                writeEventArgs.SetBuffer(0, bufferSize);
-                lenSize += bufferSize;
-                size -= bufferSize;
-                if (!m_socket.SendAsync(writeEventArgs))
+                bufferSize = size;
+            }
+            Array.Copy(body, lenSize, sendEventArgs.Buffer, len.Length, bufferSize);
+            lenSize += bufferSize;
+            size -= bufferSize;
+            if (!m_socket.SendAsync(sendEventArgs))
+            {
+                this.ProcessSend(sendEventArgs);
+            }
+            while (true)
+            {
+                if (size <= 0) break;
+                sendEventArgs = m_sendPool.PopOrNew(CreateArg);
+                if (size <= m_bufferSize)
                 {
-                    this.ProcessSend(writeEventArgs);
+                    bufferSize = size;
+                }
+                else
+                {
+                    bufferSize = m_bufferSize;
+                }
+                Array.Copy(body, lenSize, sendEventArgs.Buffer, sendEventArgs.Offset, bufferSize);
+                sendEventArgs.SetBuffer(0, m_bufferSize);
+                size -= bufferSize;
+                lenSize += bufferSize;
+                if (!m_socket.SendAsync(sendEventArgs))
+                {
+                    this.ProcessSend(sendEventArgs);
                 }
             }
         }
@@ -82,10 +106,7 @@ namespace ProducerServer.NIOClient
             AsyncUserToken token = (AsyncUserToken)e.UserToken;
             if (e.BytesTransferred > 0)
             {
-                //读取数据  
-                byte[] data = new byte[e.BytesTransferred];
-                Array.Copy(e.Buffer, e.Offset, data, 0, e.BytesTransferred);
-                token.Buffer.AddRange(data);
+                token.Buffer.AddArgsByte(e);
                 while (token.Buffer.Count > 4)
                 {
                     //判断包的长度  
@@ -99,11 +120,11 @@ namespace ProducerServer.NIOClient
                     token.Buffer.RemoveRange(0, packageLen + 4);
                     //将数据包交给后台处理,这里你也可以新开个线程来处理.加快速度.  
                     //另外beginInvoke 在.net core 3.1平台不允许操作了
-                    if (ReceiveComplete != null)
+                    if (OnReceiveComplete != null)
                     {
                         Task.Run(() =>
                         {
-                            return ReceiveComplete.Invoke(result);
+                            return OnReceiveComplete.Invoke(result);
                         }).ContinueWith(result =>
                         {
                             ExecuteSendAsyncCallBack(result.Result);
@@ -127,9 +148,10 @@ namespace ProducerServer.NIOClient
         }
         private void ProcessSend(SocketAsyncEventArgs e)
         {
+            m_sendPool.Push(e);
             if (e.SocketError == SocketError.Success)
             {
-                m_sendPool.Push(e);
+                Console.WriteLine("发送消息成功");
             }
             else
             {
@@ -139,6 +161,7 @@ namespace ProducerServer.NIOClient
 
         private void CloseClientSocket()
         {
+            Console.WriteLine("发送消息失败");
             m_socket.Close();
         }
     }

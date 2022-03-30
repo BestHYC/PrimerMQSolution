@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace ProducerServer.NIOClient
+namespace NIOSocketSolution
 {
     public sealed class AsyncUserToken
     {

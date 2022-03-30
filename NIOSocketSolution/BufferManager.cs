@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 
-namespace ProducerServer.NIOClient
+namespace NIOSocketSolution
 {
+    /// <summary>
+    /// 缓存管理,共用一个缓存字节池,避免大量的 字节创建,增加GC
+    /// </summary>
     internal sealed class BufferManager
     {
         private int m_numBytes;

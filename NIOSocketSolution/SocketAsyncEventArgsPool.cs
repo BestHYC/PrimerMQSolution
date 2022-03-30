@@ -4,11 +4,15 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace ProducerServer.NIOClient
+namespace NIOSocketSolution
 {
     public class SocketAsyncEventArgsPool
     {
         private Stack<SocketAsyncEventArgs> m_pool;
+        /// <summary>
+        /// 全局公用一个发送连接池,避免大量创建SocketAsyncEventArgsPool及字节对象信息
+        /// 注意 此处可以用 共用连接池,但是会限定发送Socket的数量,后期自己取舍
+        /// </summary>
         public static SocketAsyncEventArgsPool InstanceSend = new SocketAsyncEventArgsPool();
         public SocketAsyncEventArgsPool(int maxNum = 10)
         {
