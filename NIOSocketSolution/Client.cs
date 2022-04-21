@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace NIOSocketSolution
 {
+    /// <summary>
+    /// 客户端处理Socket请求
+    /// </summary>
     public class Client
     {
         SocketAsyncEventArgsPool m_sendPool;

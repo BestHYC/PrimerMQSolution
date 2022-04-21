@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace NIOSocketSolution
 {
+    /// <summary>
+    /// 服务端处理Socket请求
+    /// </summary>
     public class Server
     {
         private int m_numConnections; 
