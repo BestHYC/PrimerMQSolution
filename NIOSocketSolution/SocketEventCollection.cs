@@ -9,16 +9,16 @@ namespace NIOSocketSolution
     /// 服务接收到Socket请求完成
     /// </summary>
     /// <param name="e"></param>
-    public delegate void OnAcceptComplete(SocketAsyncEventArgs e);
+    public delegate void OnAcceptComplete(AsyncUserToken token);
     /// <summary>
     /// 客户端与服务端连接完成
     /// </summary>
     /// <param name="e"></param>
-    public delegate void OnConnectComplete(SocketAsyncEventArgs e);
+    public delegate void OnConnectComplete(AsyncUserToken token);
     /// <summary>  
     /// 接收到客户端的数据  
     /// </summary>  
     /// <param name="token">客户端</param>  
     /// <param name="buff">客户端数据</param>
-    public delegate String OnReceiveComplete(String buff);
+    public delegate String OnReceiveComplete(AsyncUserToken token, String buff);
 }

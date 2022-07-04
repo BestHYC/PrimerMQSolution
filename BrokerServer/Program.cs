@@ -1,5 +1,8 @@
-﻿using NIOSocketSolution;
+﻿using BrokerServer.Exchange;
+using BrokerServer.Queue;
+using NIOSocketSolution;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 
@@ -11,39 +14,59 @@ namespace BrokerServer
         {
             IPEndPoint ipEnd = new IPEndPoint(IPAddress.Any, 5566);
             Server server = new Server(1000, 1024 * 1024);
-            server.OnReceiveComplete += (buff) =>
-            {
-                Console.WriteLine(buff);
-                return buff;
-            };
+            
+            
             server.Start(ipEnd);
             Console.WriteLine("Press any key to terminate the server process....");
             Console.ReadKey();
         }
-        private void A()
+    }
+    /// <summary>
+    /// 本来想写的复杂些,但是越些越难,反而把自己绕了进去, 就简单操作下结束
+    /// 没必要总是实现重复的简单的逻辑,只要知道运行实现即可
+    /// </summary>
+    public class ClientCollection
+    {
+        private readonly Server m_server;
+        private Dictionary<String, AsyncUserToken> m_client = new Dictionary<string, AsyncUserToken>();
+        public ClientCollection(Server server)
         {
-            int recv;
-            byte[] data = new byte[1024];
-            IPEndPoint ipEnd = new IPEndPoint(IPAddress.Any, 5566);
-            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            socket.Bind(ipEnd);
-            socket.Listen(10);
-            Console.WriteLine("Waiting for a client");
-            try
+            m_server = server;
+            server.OnReceiveComplete += (token, buff) =>
             {
-                while (true)
-                {
-                    Socket client1 = socket.Accept();
-                }
-            }
-            catch (Exception e)
+                Console.WriteLine(buff);
+                return buff;
+            };
+            server.OnAcceptComplete += token =>
             {
-                Console.WriteLine(e.ToString());
-            }
-            finally
+            };
+        }
+        /// <summary>
+        /// 一个Socket 对应MQ中的 一个Channel
+        /// 一个Channel可以订阅多个队列的消息或者发送数据给多个队列
+        /// </summary>
+        /// <param name="token"></param>
+        public void AddChannel(AsyncUserToken token)
+        {
+            lock (this)
             {
-                socket.Close();
+
             }
+        }
+        public void AddQueueToChannel(AsyncUserToken token, String queueName)
+        {
+            lock (this)
+            {
+
+            }
+        }
+        private void CreateQueue(QuequeDescriptor descriptor)
+        {
+
+        }
+        private void CreateExchange(ExchangeDescriptor descriptor)
+        {
+
         }
     }
 }

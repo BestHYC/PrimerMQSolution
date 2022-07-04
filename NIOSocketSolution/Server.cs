@@ -24,6 +24,7 @@ namespace NIOSocketSolution
         private int m_numConnectedSockets;
         private Semaphore m_maxNumberAcceptedClients;
         public event OnReceiveComplete OnReceiveComplete;
+        public event OnAcceptComplete OnAcceptComplete;
 
         public Server(int numConnections, int receiveBufferSize)
         {
@@ -96,8 +97,12 @@ namespace NIOSocketSolution
                 m_numConnectedSockets);
 
             SocketAsyncEventArgs readEventArgs = m_receivePool.Pop();
-            ((AsyncUserToken)readEventArgs.UserToken).Socket = e.AcceptSocket;
-
+            AsyncUserToken token = (AsyncUserToken)readEventArgs.UserToken;
+            token.Socket = e.AcceptSocket;
+            if(OnAcceptComplete != null)
+            {
+                OnAcceptComplete.Invoke(token);
+            }
             // As soon as the client is connected, post a receive to the connection
             bool willRaiseEvent = e.AcceptSocket.ReceiveAsync(readEventArgs);
             if (!willRaiseEvent)
@@ -145,7 +150,7 @@ namespace NIOSocketSolution
                     {
                         Task.Run(() =>
                         {
-                            return OnReceiveComplete.Invoke(result);
+                            return OnReceiveComplete.Invoke(token, result);
                         }).ContinueWith(result =>
                         {
                             ExecuteSendAsyncCallBack(token, result.Result);
@@ -163,7 +168,7 @@ namespace NIOSocketSolution
                 CloseClientSocket(e);
             }
         }
-        private void ExecuteSendAsyncCallBack(AsyncUserToken token, String sendData)
+        public void ExecuteSendAsyncCallBack(AsyncUserToken token, String sendData)
         {
             if (String.IsNullOrWhiteSpace(sendData)) return;
             byte[] body = Encoding.UTF8.GetBytes(sendData);
