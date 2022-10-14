@@ -18,5 +18,9 @@ namespace NIOSocketSolution
         {
             Buffer = new List<byte>();
         }
+        public override int GetHashCode()
+        {
+            return Socket.GetHashCode();
+        }
     }
 }

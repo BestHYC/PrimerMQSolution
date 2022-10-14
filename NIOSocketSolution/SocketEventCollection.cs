@@ -21,4 +21,7 @@ namespace NIOSocketSolution
     /// <param name="token">客户端</param>  
     /// <param name="buff">客户端数据</param>
     public delegate String OnReceiveComplete(AsyncUserToken token, String buff);
+
+    public delegate String OnClientReceiveComplete(String buff);
+
 }

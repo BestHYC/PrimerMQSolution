@@ -16,7 +16,7 @@ namespace NIOSocketSolution
     {
         SocketAsyncEventArgsPool m_sendPool;
         private readonly Int32 m_bufferSize;
-        public event OnReceiveComplete OnReceiveComplete;
+        public event OnClientReceiveComplete OnReceiveComplete;
         private List<byte> m_buffer;
         private Socket m_socket;
         public Client(Int32 bufferSize)

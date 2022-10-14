@@ -1,11 +1,7 @@
-﻿using BrokerServer.Common;
-using BrokerServer.Message;
-using NIOSocketSolution;
+﻿using BrokerServer.Message;
+using NIOSocketSolution.Common;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 
 namespace BrokerServer.Queue
 {

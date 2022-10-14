@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace BrokerServer.Common
+namespace NIOSocketSolution.Common
 {
     /// <summary>
     /// 这里为了展示就随意写Logger日志记录了

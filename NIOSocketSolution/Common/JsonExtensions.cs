@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Text;
-namespace BrokerServer.Common
+namespace NIOSocketSolution.Common
 {
     public static class JsonExtensions
     {
